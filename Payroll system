@@ -1,1 +1,213 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+struct payroll {
+    int id;
+    char name[100];
+    int age;
+    char department[50];
+    float salary;
+};
+
+struct payroll payrolls[100];
+int employeecount = 0;
+
+void mainmenu() {
+    printf("\n========= PAYROLL MANAGEMENT =========\n");
+    printf("1. ADD EMPLOYEE\n");
+    printf("2. VIEW ALL EMPLOYEES\n");
+    printf("3. UPDATE EMPLOYEE\n");
+    printf("4. DELETE EMPLOYEE\n");
+    printf("5. GENERATE PAYSLIP SUMMARY\n");
+    printf("6. SAVE AND EXIT\n");
+    printf("Enter your choice: ");
+}
+
+void addemployee() {
+    printf("\nENTER EMPLOYEE ID: ");
+    scanf("%d", &payrolls[employeecount].id);
+
+    printf("ENTER EMPLOYEE NAME: ");
+    getchar();
+    fgets(payrolls[employeecount].name, 100, stdin);
+    payrolls[employeecount].name[strcspn(payrolls[employeecount].name, "\n")] = '\0';
+
+    printf("ENTER AGE: ");
+    scanf("%d", &payrolls[employeecount].age);
+
+    printf("ENTER DEPARTMENT: ");
+    getchar();
+    fgets(payrolls[employeecount].department, 50, stdin);
+    payrolls[employeecount].department[strcspn(payrolls[employeecount].department, "\n")] = '\0';
+
+    printf("ENTER SALARY: ");
+    scanf("%f", &payrolls[employeecount].salary);
+
+    employeecount++;
+
+    printf("\nEMPLOYEE ADDED SUCCESSFULLY!\n");
+}
+
+void viewemployee() {
+    if (employeecount == 0) {
+        printf("\nNO EMPLOYEES TO DISPLAY!\n");
+        return;
+    }
+
+    printf("\n========= EMPLOYEE LIST =========\n");
+
+    {
+        int i;
+        for (i = 0; i < employeecount; i++) {
+            printf("\nEMPLOYEE ID: %d\nNAME: %s\nAGE: %d\nDEPARTMENT: %s\nSALARY: %.2f\n",
+                   payrolls[i].id,
+                   payrolls[i].name,
+                   payrolls[i].age,
+                   payrolls[i].department,
+                   payrolls[i].salary);
+        }
+    }
+}
+
+void updateemployee() {
+    int id, index = -1;
+    int i;
+
+    printf("\nENTER EMPLOYEE ID TO UPDATE: ");
+    scanf("%d", &id);
+
+    for (i = 0; i < employeecount; i++) {
+        if (payrolls[i].id == id) {
+            index = i;
+            break;
+        }
+    }
+
+    if (index == -1) {
+        printf("\nEMPLOYEE NOT FOUND!\n");
+        return;
+    }
+
+    printf("\nUPDATING DETAILS FOR EMPLOYEE ID %d\n", id);
+
+    printf("ENTER NEW NAME: ");
+    getchar();
+    fgets(payrolls[index].name, 100, stdin);
+    payrolls[index].name[strcspn(payrolls[index].name, "\n")] = '\0';
+
+    printf("ENTER NEW AGE: ");
+    scanf("%d", &payrolls[index].age);
+
+    printf("ENTER NEW DEPARTMENT: ");
+    getchar();
+    fgets(payrolls[index].department, 50, stdin);
+    payrolls[index].department[strcspn(payrolls[index].department, "\n")] = '\0';
+
+    printf("ENTER NEW SALARY: ");
+    scanf("%f", &payrolls[index].salary);
+
+    printf("\nEMPLOYEE DETAILS UPDATED SUCCESSFULLY!\n");
+}
+
+void deleteemployee() {
+    int id, index = -1;
+    int i;
+
+    printf("\nENTER EMPLOYEE ID TO DELETE: ");
+    scanf("%d", &id);
+
+    for (i = 0; i < employeecount; i++) {
+        if (payrolls[i].id == id) {
+            index = i;
+            break;
+        }
+    }
+
+    if (index == -1) {
+        printf("\nEMPLOYEE NOT FOUND!\n");
+        return;
+    }
+
+    for (i = index; i < employeecount - 1; i++) {
+        payrolls[i] = payrolls[i + 1];
+    }
+
+    employeecount--;
+    printf("\nEMPLOYEE DELETED SUCCESSFULLY!\n");
+}
+
+void generatepayslip() {
+    float totalsalary = 0, tax, netsalary;
+    int i;
+
+    for (i = 0; i < employeecount; i++) {
+        totalsalary += payrolls[i].salary;
+    }
+
+    tax = totalsalary * 0.10;
+    netsalary = totalsalary - tax;
+
+    printf("\n========= PAYROLL SUMMARY =========\n");
+    printf("TOTAL SALARY: %.2f\n", totalsalary);
+    printf("TAX (10%%): %.2f\n", tax);
+    printf("NET SALARY: %.2f\n", netsalary);
+}
+
+void savefile() {
+    FILE *file = fopen("employee.txt", "w");
+    int i;
+
+    for (i = 0; i < employeecount; i++) {
+        fprintf(file, "%d,%s,%d,%s,%.2f\n",
+                payrolls[i].id,
+                payrolls[i].name,
+                payrolls[i].age,
+                payrolls[i].department,
+                payrolls[i].salary);
+    }
+
+    fclose(file);
+    printf("\nDATA SAVED SUCCESSFULLY!\n");
+}
+
+int main() {
+    int choice;
+
+    while (1) {
+        mainmenu();
+        scanf("%d", &choice);
+
+        switch (choice) {
+        case 1:
+            addemployee();
+            break;
+
+        case 2:
+            viewemployee();
+            break;
+
+        case 3:
+            updateemployee();
+            break;
+
+        case 4:
+            deleteemployee();
+            break;
+
+        case 5:
+            generatepayslip();
+            break;
+
+        case 6:
+            savefile();
+            exit(0);
+
+        default:
+            printf("\nINVALID CHOICE!\n");
+        }
+    }
+
+    return 0;
+}
 
